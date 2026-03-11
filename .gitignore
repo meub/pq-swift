@@ -1,6 +1,7 @@
 .build/
 .swiftpm/
 .claude/
+CLAUDE.md
 *.xcodeproj/
 xcuserdata/
 DerivedData/
