@@ -54,14 +54,14 @@ final class BackupManager {
         // Ensure backup folder exists
         try? FileManager.default.createDirectory(atPath: backupFolder, withIntermediateDirectories: true)
 
-        // Build filename: CharName [Realm] - 2026-03-11_14-30-00.pq.json
+        // Build filename: CharName [Realm] - 2026-03-11_14-30-00.pq
         let fmt = DateFormatter()
         fmt.dateFormat = "yyyy-MM-dd_HH-mm-ss"
         let timestamp = fmt.string(from: Date())
 
         let srcURL = URL(fileURLWithPath: srcPath)
         let baseName = srcURL.deletingPathExtension().deletingPathExtension().lastPathComponent
-        let ext = srcPath.hasSuffix(".pq.json") ? ".pq.json" : ("." + srcURL.pathExtension)
+        let ext = ".pq"
         let backupName = "\(baseName) - \(timestamp)\(ext)"
         let destPath = (backupFolder as NSString).appendingPathComponent(backupName)
 

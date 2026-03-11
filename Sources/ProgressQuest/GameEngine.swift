@@ -672,7 +672,11 @@ final class GameEngine {
         if savePath.isEmpty {
             var fn = characterName
             if !hostName.isEmpty { fn += " [\(hostName)]" }
-            savePath = NSHomeDirectory() + "/" + fn + ".pq.json"
+            savePath = NSHomeDirectory() + "/" + fn + ".pq"
+        }
+        // Migrate legacy .pq.json paths to .pq
+        if savePath.hasSuffix(".pq.json") {
+            savePath = String(savePath.dropLast(5))
         }
         return savePath
     }
@@ -693,9 +697,8 @@ final class GameEngine {
             hostName: hostName, hostAddr: hostAddr,
             login: login, password: password, guild: guild, opts: opts
         )
-        guard let json = try? JSONEncoder().encode(data) else { return }
         let path = gameSaveName()
-        try? json.write(to: URL(fileURLWithPath: path), options: .atomic)
+        try? DelphiSaveWriter.save(data, to: path)
     }
 
     func loadGame(_ path: String) throws {

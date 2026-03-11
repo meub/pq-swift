@@ -70,14 +70,13 @@ Made with help from [Claude Code](https://claude.ai/code)
 - Guild support
 
 ### Save System
-- **Native JSON format**: `.pq.json` files with complete game state
-- **Auto-save**: On level-ups, quest completions, and act transitions to `~/<CharacterName>.pq.json`
-- **Legacy support**: Load original Delphi `.pq` binary save files (zlib-compressed DFM format)
-- **Content-based format detection**: Automatically detects JSON vs. compressed Delphi vs. raw DFM
+- **Delphi-compatible binary format**: Saves as `.pq` files (zlib-compressed DFM component streams), fully compatible with the original Progress Quest
+- **Auto-save**: On level-ups, quest completions, and act transitions to `~/<CharacterName>.pq`
+- **Cross-compatible**: Save files can be loaded by any version of Progress Quest
 
 ### Automatic Backups
 - Configurable schedule: Off, Daily, or Weekly
-- Timestamped backup files: `CharName - 2026-03-11_14-30-00.pq.json`
+- Timestamped backup files: `CharName - 2026-03-11_14-30-00.pq`
 - Customizable backup folder (default: `~/Documents/ProgressQuest Backups`)
 - Manual "Back Up Now" button in Settings
 - Preferences persisted across launches
@@ -117,7 +116,7 @@ swift build -c release
 3. From the title screen, pick:
    - **New Game (Single Player)** — Create a character and play offline
    - **New Game (Multiplayer)** — Register on an official PQ realm
-   - **Load Game** — Resume from a `.pq.json` or legacy `.pq` save file
+   - **Load Game** — Resume from a `.pq` save file
    - **Exit** — Close the window
 
 ### Character Creation
@@ -142,7 +141,7 @@ Once started, the game runs automatically. Your character will:
 
 ### Saving & Quitting
 
-- Games auto-save to `~/<CharacterName>.pq.json` at key milestones
+- Games auto-save to `~/<CharacterName>.pq` at key milestones
 - Clicking **Quit** in the menu bar saves the game and shows a confirmation with the save file path before exiting
 
 ### Settings
@@ -168,7 +167,8 @@ Sources/ProgressQuest/
 ├── GameData.swift           — Static data tables (270+ monsters, items, spells, races, classes)
 ├── Server.swift             — Online play: LFSR auth, realm list, registration, bragging
 ├── BackupManager.swift      — Scheduled and manual backup system
-├── DelphiSaveParser.swift   — Parser for original Delphi binary .pq save files
+├── DelphiSaveParser.swift   — Reader for Delphi binary .pq save files
+├── DelphiSaveWriter.swift   — Writer for Delphi binary .pq save files
 ├── Utilities.swift          — Name gen, roman numerals, English morphology, random helpers
 └── Resources/
     ├── pq-logo.png          — Title screen logo
@@ -181,7 +181,7 @@ Sources/ProgressQuest/
 - **Task queue system** — Cinematic sequences and multi-step actions (market visits, plot transitions) are queued as pipe-delimited strings and dequeued sequentially
 - **Timer-driven game loop** — A 100ms repeating `Timer` drives `tick()`, which advances `taskPos` and triggers state transitions (level-ups, quest completions, act transitions)
 - **Menu bar as primary UI** — `NSApp.setActivationPolicy(.accessory)` hides from Dock; `MenuBarExtra` with `.window` style provides a compact popover
-- **Content-based format detection** — Save files are identified by first byte (`0x7B` = JSON, `0x78` = zlib Delphi, `0x54` = raw TPF0) rather than file extension
+- **Delphi-compatible save format** — Reads and writes the same zlib-compressed DFM binary format as the original Progress Quest, ensuring full interoperability
 - **LFSR authentication** — Implements the original Delphi-compatible Linear Feedback Shift Register hash for signing server requests with `UInt32` truncating arithmetic
 - **Level-matched selection** — Monsters and equipment are chosen via best-of-6 random sampling (`lpick()`), keeping the closest match for the player's level
 
@@ -197,15 +197,12 @@ When playing on an official realm, the game:
 
 ## Save Format
 
-### Native Format (`.pq.json`)
-JSON files containing the complete `SaveData` struct: character traits, stats, equipment, inventory, spells, quests, plot progress, task queue state, and online credentials (realm, passkey, guild).
+Uses the same `.pq` binary format as the original Progress Quest — zlib-compressed Delphi DFM component streams. Save files are fully interchangeable between the Swift edition and other versions of Progress Quest.
 
-### Legacy Format (`.pq`)
-Original Delphi binary save files are supported read-only. The parser handles:
-- Zlib decompression (2-byte header stripped)
-- TPF0 DFM binary format with property tags (vaInt8/16/32/64, vaString, vaBinary, vaIdent, vaFalse/True, vaCollection, vaList, etc.)
-- TListView Items.Data blob extraction (captions, subitems, state indices)
-- Component-to-field mapping for all 37 game state components
+The format stores game state across 17 serialized components:
+- **TListView** components for character traits, stats, spells, equipment, inventory, quests, and plot acts (with TListView Items.Data binary blobs)
+- **TGauge** components for experience, quest, plot, and task progress bars
+- **TLabel/TListBox** components for task state, quest targets, task queue, game style, and online credentials
 
 ## Credits
 
