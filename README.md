@@ -14,6 +14,13 @@ Made with help from [Claude Code](https://claude.ai/code)
 
 > **Note:** The app is not code-signed. On first launch, right-click the app and choose "Open" to bypass Gatekeeper, or go to System Settings > Privacy & Security and click "Open Anyway".
 
+## Limitations
+
+- **macOS 14 (Sonoma) or later** — Uses SwiftUI APIs introduced in macOS 14; will not run on Ventura or earlier
+- **Not code-signed or notarized** — macOS Gatekeeper will block the app on first launch; you must manually approve it (see install note above)
+- **Multiplayer requires HTTP** — The official Progress Quest server (`progressquest.com`) only supports HTTP, not HTTPS. Strict network configurations or firewalls that block plain HTTP may prevent multiplayer features from working
+- **No iCloud or cross-device sync** — Save files are stored locally in your home directory
+
 ## Screenshots
 
 | Menu Bar Popover | Game Window |
