@@ -4,6 +4,8 @@ A native macOS reimplementation of [Progress Quest](http://progressquest.com/), 
 
 **Unofficial macOS Swift Version — Compatible with v6.4.4**
 
+Made with help from [Claude Code](https://claude.ai/code)
+
 ## Features
 
 ### Zero-Effort Gameplay
