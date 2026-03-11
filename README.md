@@ -79,7 +79,13 @@ Made with help from [Claude Code](https://claude.ai/code)
 - macOS 14 (Sonoma) or later
 - Swift 5.9+
 
-## Building & Running
+## Install
+
+**[Download the latest DMG](https://github.com/meub/pq-swift/releases/latest/download/ProgressQuest-v1.0.dmg)** from the [Releases](https://github.com/meub/pq-swift/releases) page, open it, and drag ProgressQuest to your Applications folder.
+
+> **Note:** The app is not code-signed. On first launch, right-click the app and choose "Open" to bypass Gatekeeper, or go to System Settings > Privacy & Security and click "Open Anyway".
+
+## Building from Source
 
 ```bash
 # Clone and build
