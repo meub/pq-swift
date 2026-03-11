@@ -1,5 +1,7 @@
 # Progress Quest — Swift Edition
 
+[![Release](https://img.shields.io/github/v/release/meub/pq-swift)](https://github.com/meub/pq-swift/releases/tag/v1.0)
+
 A native macOS reimplementation of [Progress Quest](http://progressquest.com/), the original zero-player RPG. Your character automatically fights monsters, completes quests, levels up, and advances through an epic plot — all without any player interaction whatsoever.
 
 **Unofficial macOS Swift Version — Compatible with v6.4.4**
