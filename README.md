@@ -6,6 +6,16 @@ A native macOS reimplementation of [Progress Quest](http://progressquest.com/), 
 
 Made with help from [Claude Code](https://claude.ai/code)
 
+## Screenshots
+
+| Menu Bar Popover | Game Window |
+|:---:|:---:|
+| ![Menu bar popover showing character status, task progress, and XP](screenshots/menubar.png) | ![Main game window with 3-column layout](screenshots/gamewindow.png) |
+
+**Menu Bar** — Lives in your menu bar with a compact popover showing character name, level, current task progress, and XP. Quick access to the game window, settings, and quit.
+
+**Game Window** — Classic three-column layout: character sheet with stats and spellbook on the left, equipment and inventory in the middle, plot development and quest log on the right. The bottom status bar tracks your current action in real time.
+
 ## Features
 
 ### Zero-Effort Gameplay
