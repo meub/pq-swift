@@ -17,6 +17,11 @@ struct MenuBarIcon: View {
 class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
+        // Set app icon from bundled resource
+        if let url = Bundle.module.url(forResource: "AppIcon", withExtension: "icns", subdirectory: "Resources"),
+           let icon = NSImage(contentsOf: url) {
+            NSApp.applicationIconImage = icon
+        }
     }
 }
 
