@@ -72,9 +72,30 @@ final class BackupManager {
 
     // MARK: - Timer
 
+    /// Interval between checks (5 minutes). The actual backup frequency
+    /// is determined by `schedule`; this just polls for whether one is due.
+    private static let checkInterval: TimeInterval = 5 * 60
+
     private func rescheduleTimer() {
         timer?.invalidate()
         timer = nil
+
+        guard schedule != .off else { return }
+
+        // Check immediately, then poll every 5 minutes on the main run loop
+        checkAndBackup()
+
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.timer = Timer.scheduledTimer(withTimeInterval: Self.checkInterval, repeats: true) { [weak self] _ in
+                self?.checkAndBackup()
+            }
+            RunLoop.main.add(self.timer!, forMode: .common)
+        }
+    }
+
+    private func checkAndBackup() {
+        guard schedule != .off, engine?.isRunning == true else { return }
 
         let interval: TimeInterval
         switch schedule {
@@ -83,19 +104,10 @@ final class BackupManager {
         case .weekly: interval = 7 * 24 * 60 * 60
         }
 
-        // Check if a backup is due now
         if let last = lastBackup {
-            if Date().timeIntervalSince(last) >= interval {
-                backupNow()
-            }
-        } else if engine?.isRunning == true {
-            // First backup
-            backupNow()
+            guard Date().timeIntervalSince(last) >= interval else { return }
         }
-
-        timer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { [weak self] _ in
-            self?.backupNow()
-        }
+        backupNow()
     }
 
     // MARK: - Persistence
