@@ -1,6 +1,6 @@
 # Progress Quest — Swift Edition
 
-[![Release](https://img.shields.io/github/v/release/meub/pq-swift)](https://github.com/meub/pq-swift/releases/tag/v1.0)
+[![Release](https://img.shields.io/github/v/release/meub/pq-swift)](https://github.com/meub/pq-swift/releases/tag/v1.2)
 
 A native macOS reimplementation of [Progress Quest](http://progressquest.com/), the original zero-player RPG. Your character automatically fights monsters, completes quests, levels up, and advances through an epic plot — all without any player interaction whatsoever.
 
@@ -10,7 +10,7 @@ Made with help from [Claude Code](https://claude.ai/code)
 
 ## Install
 
-**[Download the latest DMG](https://github.com/meub/pq-swift/releases/latest/download/ProgressQuest-v1.1.dmg)** from the [Releases](https://github.com/meub/pq-swift/releases) page, open it, and drag ProgressQuest to your Applications folder.
+**[Download the latest DMG](https://github.com/meub/pq-swift/releases/latest/download/ProgressQuest-v1.2.dmg)** from the [Releases](https://github.com/meub/pq-swift/releases) page, open it, and drag ProgressQuest to your Applications folder.
 
 > **Note:** The app is not code-signed. On first launch, right-click the app and choose "Open" to bypass Gatekeeper, or go to System Settings > Privacy & Security and click "Open Anyway".
 
