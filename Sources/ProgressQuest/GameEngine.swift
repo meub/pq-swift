@@ -191,7 +191,7 @@ final class GameEngine {
             }
             lev = targetLevel
             taskCaption = "kill|\(monsterName)|\(targetLevel)|*"
-        } else if !questMonster.isEmpty && odds(1, 4) {
+        } else if !questMonster.isEmpty && odds(1, 4) && questMonsterTag >= 0 && questMonsterTag < GameData.monsters.count {
             let m = GameData.monsters[questMonsterTag]
             monsterName = splitPipe(m, 0)
             lev = Int(splitPipe(m, 1)) ?? 0
@@ -614,13 +614,13 @@ final class GameEngine {
 
     // MARK: - Online
 
-    private var hostAddrResolved: String {
+    var hostAddrResolved: String {
         if !hostAddr.isEmpty { return hostAddr }
         if passkey != 0 { return PQServer.defaultHost }
         return ""
     }
 
-    private var bragTraits: [(String, String)] {
+    var bragTraits: [(String, String)] {
         [("n", characterName), ("r", race), ("c", klass), ("l", "\(level)")]
     }
 
@@ -651,19 +651,42 @@ final class GameEngine {
         return (names[best], stats[names[best]] ?? 0)
     }
 
+    /// Last level successfully bragged to the server, keyed per character.
+    private var lastBragLevelKey: String { "PQLastBragLevel_\(characterName)_\(hostName)" }
+    private var lastBragLevel: Int {
+        get { UserDefaults.standard.integer(forKey: lastBragLevelKey) }
+        set { UserDefaults.standard.set(newValue, forKey: lastBragLevelKey) }
+    }
+
     func doBrag(_ trigger: String) {
         guard passkey != 0 else { return }
-        let stat = bestStat
-        let act = plots.last?.name ?? "Prologue"
-        Task {
-            await PQServer.brag(
-                trigger: trigger, traits: bragTraits, expPos: expPos,
-                bestEquip: bestEquipStr, bestSpell: bestSpellStr,
-                bestStatName: stat.name, bestStatVal: stat.val,
-                currentAct: act, hostName: hostName,
-                hostAddr: hostAddrResolved, passkey: passkey, motto: motto
-            )
+
+        // If the server is behind by more than 1 level, send incremental brags to catch up
+        let serverLevel = lastBragLevel
+        if serverLevel > 0 && level > serverLevel + 1 {
+            for catchUpLevel in (serverLevel + 1)..<level {
+                PQServer.sendBrag(
+                    trigger: "l", traits: bragTraitsWithLevel(catchUpLevel), expPos: 0,
+                    bestEquip: bestEquipStr, bestSpell: bestSpellStr,
+                    bestStatName: bestStat.name, bestStatVal: bestStat.val,
+                    currentAct: plots.last?.name ?? "Prologue", hostName: hostName,
+                    hostAddr: hostAddrResolved, passkey: passkey, motto: motto
+                )
+            }
         }
+
+        PQServer.sendBrag(
+            trigger: trigger, traits: bragTraits, expPos: expPos,
+            bestEquip: bestEquipStr, bestSpell: bestSpellStr,
+            bestStatName: bestStat.name, bestStatVal: bestStat.val,
+            currentAct: plots.last?.name ?? "Prologue", hostName: hostName,
+            hostAddr: hostAddrResolved, passkey: passkey, motto: motto
+        )
+        lastBragLevel = level
+    }
+
+    private func bragTraitsWithLevel(_ lvl: Int) -> [(String, String)] {
+        [("n", characterName), ("r", race), ("c", klass), ("l", "\(lvl)")]
     }
 
     // MARK: - Save / Load

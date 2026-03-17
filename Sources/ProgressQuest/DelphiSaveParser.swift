@@ -191,7 +191,7 @@ enum DelphiSaveParser {
             }
             return .list(items)
         case 0x02: // vaInt8
-            return .int(Int(Int8(bitPattern: try reader.readByte())))
+            return .int(Int(try reader.readByte()))
         case 0x03: // vaInt16
             let val = try reader.readUInt16LE()
             return .int(Int(Int16(bitPattern: val)))

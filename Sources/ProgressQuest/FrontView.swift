@@ -73,6 +73,9 @@ struct FrontView: View {
                 Link("progressquest.com", destination: URL(string: "http://progressquest.com/")!)
                     .font(.caption)
                     .foregroundStyle(.blue)
+                Text("Build \(AppBuild.number)")
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
             }
             .frame(width: 220)
             .padding(.trailing, 24)
@@ -96,6 +99,7 @@ struct FrontView: View {
                     defer { url.stopAccessingSecurityScopedResource() }
                     try engine.loadGame(url.path)
                     engine.startTimer()
+                    engine.doBrag("s")
                     loadError = nil
                 } catch {
                     loadError = error.localizedDescription

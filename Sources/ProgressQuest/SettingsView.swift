@@ -32,6 +32,45 @@ struct SettingsView: View {
                 .padding(4)
             }
 
+            // Motto & Guild
+            if engine.isRunning && engine.passkey != 0 {
+                GroupBox("Leaderboard") {
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Text("Motto:")
+                                .foregroundStyle(.secondary)
+                                .frame(width: 50, alignment: .trailing)
+                            TextField("Shown on leaderboard", text: Binding(
+                                get: { engine.motto },
+                                set: { engine.motto = $0 }
+                            ))
+                                .textFieldStyle(.roundedBorder)
+                            Button("Update") { engine.doBrag("s") }
+                                .controlSize(.small)
+                        }
+                        HStack {
+                            Text("Guild:")
+                                .foregroundStyle(.secondary)
+                                .frame(width: 50, alignment: .trailing)
+                            TextField("Guild name", text: Binding(
+                                get: { engine.guild },
+                                set: { engine.guild = $0 }
+                            ))
+                                .textFieldStyle(.roundedBorder)
+                            Button("Update") {
+                                PQServer.sendGuildify(
+                                    traits: engine.bragTraits, hostName: engine.hostName,
+                                    hostAddr: engine.hostAddrResolved, passkey: engine.passkey,
+                                    guild: engine.guild
+                                )
+                            }
+                                .controlSize(.small)
+                        }
+                    }
+                    .padding(4)
+                }
+            }
+
             // Backup settings
             GroupBox("Backups") {
                 VStack(alignment: .leading, spacing: 10) {
@@ -102,7 +141,7 @@ struct SettingsView: View {
             }
         }
         .padding()
-        .frame(width: 420, height: 340)
+        .frame(width: 420, height: 420)
         .fileImporter(isPresented: $showFolderPicker,
                       allowedContentTypes: [.folder],
                       allowsMultipleSelection: false) { result in

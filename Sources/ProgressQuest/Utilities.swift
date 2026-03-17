@@ -2,6 +2,12 @@ import Foundation
 import SwiftUI
 import AppKit
 
+// MARK: - Build number
+
+enum AppBuild {
+    static let number = 9
+}
+
 // MARK: - Window configurator
 
 /// NSViewRepresentable that configures the hosting NSWindow on appear.

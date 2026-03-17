@@ -90,12 +90,13 @@ enum PQServer {
 
     // MARK: - Brag (status report)
 
-    static func brag(trigger: String, traits: [(String, String)], expPos: Int,
-                     bestEquip: String, bestSpell: String,
-                     bestStatName: String, bestStatVal: Int,
-                     currentAct: String, hostName: String,
-                     hostAddr: String, passkey: Int,
-                     motto: String = "") async {
+    /// Build a brag URL and fire it immediately using URLSession.dataTask (no async/await).
+    static func sendBrag(trigger: String, traits: [(String, String)], expPos: Int,
+                         bestEquip: String, bestSpell: String,
+                         bestStatName: String, bestStatVal: Int,
+                         currentAct: String, hostName: String,
+                         hostAddr: String, passkey: Int,
+                         motto: String = "") {
         guard passkey != 0 else { return }
         let addr = hostAddr.isEmpty ? defaultHost : hostAddr
 
@@ -115,15 +116,18 @@ enum PQServer {
         url += "&p=\(lfsr(url, salt: passkey))"
         url += "&m=\(urlEncode(motto))"
 
-        _ = try? await downloadString(addr + url)
+        guard let reqURL = URL(string: addr + url) else { return }
+        var request = URLRequest(url: reqURL, timeoutInterval: 10)
+        request.setValue("PQ6.4", forHTTPHeaderField: "User-Agent")
+        URLSession.shared.dataTask(with: request).resume()
     }
 
     // MARK: - Guild
 
-    static func guildify(traits: [(String, String)], hostName: String,
-                         hostAddr: String, passkey: Int,
-                         guild: String) async -> String? {
-        guard passkey != 0 else { return nil }
+    static func sendGuildify(traits: [(String, String)], hostName: String,
+                             hostAddr: String, passkey: Int,
+                             guild: String) {
+        guard passkey != 0 else { return }
         let addr = hostAddr.isEmpty ? defaultHost : hostAddr
 
         var url = "cmd=guild"
@@ -133,9 +137,10 @@ enum PQServer {
         url += "&guild=\(urlEncode(guild))"
         url += "&p=\(lfsr(url, salt: passkey))"
 
-        guard let body = try? await downloadString(addr + url) else { return nil }
-        let parts = body.components(separatedBy: "|")
-        return parts.first?.trimmingCharacters(in: .whitespaces)
+        guard let reqURL = URL(string: addr + url) else { return }
+        var request = URLRequest(url: reqURL, timeoutInterval: 10)
+        request.setValue("PQ6.4", forHTTPHeaderField: "User-Agent")
+        URLSession.shared.dataTask(with: request).resume()
     }
 
     enum PQError: Error, LocalizedError {

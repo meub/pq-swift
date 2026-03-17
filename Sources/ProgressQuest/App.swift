@@ -103,7 +103,7 @@ struct MenuBarView: View {
                                  total: Double(max(engine.expMax, 1)))
                         .progressViewStyle(.linear)
                     Text("\(engine.expMax - engine.expPos) to go")
-                        .font(.caption2)
+                        .font(.system(.caption2, design: .monospaced))
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                 }
