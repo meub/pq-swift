@@ -33,11 +33,6 @@ Made with help from [Claude Code](https://claude.ai/code)
 
 ## Features
 
-### Zero-Effort Gameplay
-- Characters fight, loot, level, and quest entirely on their own
-- 100ms game loop drives continuous progress through monster encounters, quests, and plot acts
-- Dramatic prologue cinematic, multi-step market visits, and act transition sequences
-
 ### Menu Bar App
 - Runs quietly in your macOS menu bar — no Dock icon
 - Click the menu bar icon for a compact status popover showing:
@@ -53,21 +48,13 @@ Made with help from [Claude Code](https://claude.ai/code)
   - **Right**: Plot development with completed act checkmarks, quest log (last 20)
 - Bottom status bar shows current action ("Executing 3 Kobolds...")
 
-### Procedural Generation
-- **270+ monsters** from Bunny to Demogorgon, with level-scaled difficulty modifiers (sick, young, big, special, undead, demon)
-- **21 races** — Half Orc, Enchanted Motorcycle, Land Squid, Double Wookiee, and more
-- **18 classes** — Ur-Paladin, Voodoo Princess, Robot Monk, Jungle Clown, and more
-- **48+ spells** — Slime Finger, Rabbit Punch, Holy Batpole, Animate Nightstand
-- Procedurally named equipment with quality modifiers (Polished, Vicious, Dancing, Vorpal, Holy)
-- Unique quests and plot acts every playthrough
-
 ### Online Multiplayer
 - Connect to official Progress Quest servers and join realms
 - Browse available realms with descriptions
 - Character registration with server-assigned passkey
 - Status reports ("brags") sent on level-ups, act completions, and game start
 - LFSR authentication compatible with the original Delphi client
-- Guild support
+- Guild and Motto support
 
 ### Save System
 - **Delphi-compatible binary format**: Saves as `.pq` files (zlib-compressed DFM component streams), fully compatible with the original Progress Quest
@@ -127,18 +114,6 @@ swift build -c release
 - Roll stats: 3d6+3 for STR, CON, DEX, INT, WIS, CHA
 - Click **Sold!** to begin your adventure
 
-### Gameplay
-
-Once started, the game runs automatically. Your character will:
-
-1. Experience a dramatic prologue cinematic
-2. Head to the killing fields to fight level-appropriate monsters
-3. Collect loot, gold, spells, and equipment upgrades
-4. Sell excess inventory at the market when encumbered
-5. Buy better equipment when gold permits
-6. Complete quests and advance through plot acts
-7. Level up with stat boosts, new spells, and HP/MP gains
-
 ### Saving & Quitting
 
 - Games auto-save to `~/<CharacterName>.pq` at key milestones
@@ -152,57 +127,6 @@ Access via the menu bar dropdown:
 - Choose a custom backup folder
 - See last backup timestamp
 - Trigger a manual backup
-
-## Architecture
-
-```
-Sources/ProgressQuest/
-├── App.swift                — @main entry, menu bar (MenuBarExtra), window scenes
-├── FrontView.swift          — Title screen with logo, version info, and action buttons
-├── NewCharacterView.swift   — Character creation: name, race, class, stat rolling
-├── RealmSelectionView.swift — Multiplayer server browser
-├── ContentView.swift        — Main 3-column game view with progress bars
-├── SettingsView.swift       — Settings window: save info, backup configuration
-├── GameEngine.swift         — Core game logic, all mutable state, save/load, timer tick
-├── GameData.swift           — Static data tables (270+ monsters, items, spells, races, classes)
-├── Server.swift             — Online play: LFSR auth, realm list, registration, bragging
-├── BackupManager.swift      — Scheduled and manual backup system
-├── DelphiSaveParser.swift   — Reader for Delphi binary .pq save files
-├── DelphiSaveWriter.swift   — Writer for Delphi binary .pq save files
-├── Utilities.swift          — Name gen, roman numerals, English morphology, random helpers
-└── Resources/
-    ├── pq-logo.png          — Title screen logo
-    └── menubar-icon.png     — Menu bar icon
-```
-
-### Key Design Decisions
-
-- **`@Observable` GameEngine** — Single source of truth for all game state, driving reactive SwiftUI updates across all views
-- **Task queue system** — Cinematic sequences and multi-step actions (market visits, plot transitions) are queued as pipe-delimited strings and dequeued sequentially
-- **Timer-driven game loop** — A 100ms repeating `Timer` drives `tick()`, which advances `taskPos` and triggers state transitions (level-ups, quest completions, act transitions)
-- **Menu bar as primary UI** — `NSApp.setActivationPolicy(.accessory)` hides from Dock; `MenuBarExtra` with `.window` style provides a compact popover
-- **Delphi-compatible save format** — Reads and writes the same zlib-compressed DFM binary format as the original Progress Quest, ensuring full interoperability
-- **LFSR authentication** — Implements the original Delphi-compatible Linear Feedback Shift Register hash for signing server requests with `UInt32` truncating arithmetic
-- **Level-matched selection** — Monsters and equipment are chosen via best-of-6 random sampling (`lpick()`), keeping the closest match for the player's level
-
-## Online Play
-
-When playing on an official realm, the game:
-
-- Fetches the realm list from `progressquest.com`
-- Registers your character with the server and receives a unique passkey
-- Reports status updates on level-ups (`"l"`), act completions (`"a"`), and game start (`"s"`)
-- Signs all server requests with an LFSR hash for Delphi-compatible authentication
-- Uses User-Agent `PQ6.4` to match the original client
-
-## Save Format
-
-Uses the same `.pq` binary format as the original Progress Quest — zlib-compressed Delphi DFM component streams. Save files are fully interchangeable between the Swift edition and other versions of Progress Quest.
-
-The format stores game state across 17 serialized components:
-- **TListView** components for character traits, stats, spells, equipment, inventory, quests, and plot acts (with TListView Items.Data binary blobs)
-- **TGauge** components for experience, quest, plot, and task progress bars
-- **TLabel/TListBox** components for task state, quest targets, task queue, game style, and online credentials
 
 ## Credits
 
