@@ -5,7 +5,7 @@ import AppKit
 // MARK: - Build number
 
 enum AppBuild {
-    static let number = 9
+    static let number = 10
 }
 
 // MARK: - Window configurator
