@@ -18,6 +18,7 @@ final class BackupManager {
     var lastBackup: Date?
 
     private var timer: Timer?
+    private var startupTimer: Timer?
     private weak var engine: GameEngine?
 
     private static let prefsKey = "PQBackupPrefs"
@@ -42,6 +43,16 @@ final class BackupManager {
         }
 
         rescheduleTimer()
+
+        // Poll frequently until the game starts running, then do initial backup check
+        DispatchQueue.main.async { [weak self] in
+            self?.startupTimer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { [weak self] t in
+                guard let self, let engine = self.engine, engine.isRunning else { return }
+                t.invalidate()
+                self.startupTimer = nil
+                self.checkAndBackup()
+            }
+        }
     }
 
     // MARK: - Backup
